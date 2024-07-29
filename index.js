@@ -38,6 +38,17 @@ app.post("/analizar", async (req, res) => {
       ...defaultIncludes,
       chromeLaunchConfig: {
         headless: "new",
+        executablePath: "/usr/bin/google-chrome",
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-accelerated-2d-canvas",
+          "--no-first-run",
+          "--no-zygote",
+          "--disable-gpu",
+        ],
+        ignoreHTTPSErrors: true,
       },
     });
     successResponseData = successResponse(pa11yResponse, url);
