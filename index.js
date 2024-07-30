@@ -2,6 +2,8 @@ import express from "express";
 import pa11y from "pa11y";
 import { errorResponse, successResponse } from "./utils.js";
 import bodyparser from "body-parser";
+import cors from "cors";
+
 const app = express();
 
 app.listen(5001, () => console.log("listening on port 5001"));
