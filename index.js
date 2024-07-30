@@ -15,15 +15,37 @@ app.use(cors());
 
 app.get("/", (req, res) => res.json("My api running"));
 
-app.post("/analizar", async (req, res) => {
+app.use(
+  cors({
+    origin: "https://accesi-web.vercel.app/",
+  })
+);
+
+app.post("/api/analizar", async (req, res) => {
   const defaultIncludes = {
     includeWarnings: true,
     includeNotices: true,
     timeout: 20000,
   };
 
+  const chromeLaunchConfig = {
+    headless: "new",
+    executablePath: "/usr/bin/google-chrome",
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--disable-gpu",
+    ],
+    ignoreHTTPSErrors: true,
+  };
+
   const url = req.body?.url;
   const actions = req.body?.actions;
+  const host = req.hostname;
   let successResponseData;
   try {
     if (!url) {
@@ -38,23 +60,11 @@ app.post("/analizar", async (req, res) => {
         .filter((line) => line.trim() !== "");
     }
     console.log("🧑‍🏭 Fetching...");
-    const pa11yResponse = await pa11y(url, {
+    const params = {
       ...defaultIncludes,
-      chromeLaunchConfig: {
-        headless: "new",
-        executablePath: "/usr/bin/google-chrome",
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox",
-          "--disable-dev-shm-usage",
-          "--disable-accelerated-2d-canvas",
-          "--no-first-run",
-          "--no-zygote",
-          "--disable-gpu",
-        ],
-        ignoreHTTPSErrors: true,
-      },
-    });
+      ...(host.includes("localhost") ? chromeLaunchConfig : {}),
+    };
+    const pa11yResponse = await pa11y(url, params);
     successResponseData = successResponse(pa11yResponse, url);
     console.log("✅ Fetch success ");
     res.status(200).json(successResponseData);
