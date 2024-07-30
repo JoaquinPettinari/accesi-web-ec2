@@ -15,11 +15,7 @@ app.use(cors());
 
 app.get("/", (req, res) => res.json("My api running"));
 
-app.use(
-  cors({
-    origin: "https://accesi-web.vercel.app/",
-  })
-);
+app.use(cors());
 
 app.post("/api/analizar", async (req, res) => {
   const defaultIncludes = {
@@ -53,17 +49,21 @@ app.post("/api/analizar", async (req, res) => {
         error: "Sin url",
       });
     }
+    const params = {
+      ...defaultIncludes,
+    };
+
     if (actions) {
-      defaultIncludes.actions = actions
+      params.actions = actions
         .split("\n")
         .map((line) => line.replace(/\r$/, ""))
         .filter((line) => line.trim() !== "");
     }
+    if (!host.includes("localhost")) {
+      params.chromeLaunchConfig = chromeLaunchConfig;
+    }
+
     console.log("🧑‍🏭 Fetching...");
-    const params = {
-      ...defaultIncludes,
-      ...(host.includes("localhost") ? {} : chromeLaunchConfig),
-    };
     const pa11yResponse = await pa11y(url, params);
     successResponseData = successResponse(pa11yResponse, url);
     console.log("✅ Fetch success ");
