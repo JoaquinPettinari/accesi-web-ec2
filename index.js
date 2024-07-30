@@ -9,6 +9,8 @@ app.listen(5001, () => console.log("listening on port 5001"));
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 
+app.use(cors());
+
 app.get("/", (req, res) => res.json("My api running"));
 
 app.post("/analizar", async (req, res) => {
