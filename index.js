@@ -62,7 +62,7 @@ app.post("/api/analizar", async (req, res) => {
     console.log("🧑‍🏭 Fetching...");
     const params = {
       ...defaultIncludes,
-      ...(host.includes("localhost") ? chromeLaunchConfig : {}),
+      ...(host.includes("localhost") ? {} : chromeLaunchConfig),
     };
     const pa11yResponse = await pa11y(url, params);
     successResponseData = successResponse(pa11yResponse, url);
